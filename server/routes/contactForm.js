@@ -1,6 +1,7 @@
 const { check, validationResult } = require('express-validator');
 const Contact = require('../models/Contact');
 const nodemailer = require('nodemailer');
+const { number } = require('joi');
 const router = require('express').Router();
 require('dotenv').config();
 
@@ -48,7 +49,7 @@ router.post(
         },
         subject: 'Form Submission',
         text: `This Email is Sent by Donation Site ICP
-        You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nMessage: ${message}`,
+        You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nNumber :${number}\nMessage: ${message}`,
       };
 
       transporter.sendMail(mailOptions, (err, response) => {
