@@ -94,7 +94,7 @@ router.post('/forget-password', async (req, res) => {
             subject: 'Password Reset',
             text: `This Email is Sent by Donation Site ICP
             Please click on the following link, or paste it into your browser to complete the process:\n\n
-            http://localhost:3000/reset-password/${token}\n\n
+            https://cs-dept-donation-site.netlify.app/reset-password/${token}\n\n
             If you did not request this, please ignore this email and your password will remain unchanged.\n`
         };
 
