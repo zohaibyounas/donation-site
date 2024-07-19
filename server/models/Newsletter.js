@@ -4,8 +4,8 @@ const newsletterSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique
+        unique: true
     }
-})
+});
 
-module.exports = mongoose.model("Newsletter",newsletterSchema);
+module.exports = mongoose.model("Newsletter", newsletterSchema);
