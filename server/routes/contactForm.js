@@ -1,7 +1,7 @@
 const { check, validationResult } = require('express-validator');
 const Contact = require('../models/Contact');
 const nodemailer = require('nodemailer');
-const { number } = require('joi');
+const Newsletter = require('../models/Newsletter');
 const router = require('express').Router();
 require('dotenv').config();
 
@@ -64,6 +64,49 @@ router.post(
       res.status(400).send(error);
     }
   }
+);
+
+router.post('/newsletter',(req,res)=>{
+  const {email} = req.body;
+  const newsletter = new Newsletter({
+    email
+  })
+  try {
+    newsletter.save();
+    res.status(200).send('Form Submitted');
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.APP_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      to: process.env.EMAIL,
+      from: {
+        name: 'Donation Site ICP',
+        email: 'cs@icp.edu.pk',
+      },
+      subject: 'Email Submission',
+      text: `This Email is Sent by Donation Site ICP
+      You have a new Newsletter Email submission :${email}`,
+    };
+
+    transporter.sendMail(mailOptions, (err, response) => {
+      if (err) {
+        console.error('Error in sending email:', err); // Log detailed error
+        return res.status(500).send('Error in sending email');
+      }
+      console.log('Email sent successfully to:', process.env.EMAIL);
+      res.status(200).send('Recovery email sent');
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}
 );
 
 module.exports = router;
