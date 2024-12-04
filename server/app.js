@@ -11,7 +11,7 @@ app.use(express.json());
 
 const corsOption = {
     exposedHeaders :  ['Content-Length','Authorization','token'],
-    origin:'https://cs-dept-donation-site.netlify.app',
+    origin:'http://localhost:3000',
     methods:['GET','POST','PUT','DELETE'],
     credentials:true
   }
