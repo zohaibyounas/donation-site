@@ -13,7 +13,7 @@ router.post(
     check('mobile', 'Invalid mobile number').matches(/^[0-9]{11}$/),
     check('message', 'Message is required').not().isEmpty(),
   ],
-  (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -21,16 +21,10 @@ router.post(
 
     const { name, email, message, mobile } = req.body;
 
-    const submission = new Contact({
-      name,
-      email,
-      message,
-      mobile,
-    });
+    const submission = new Contact({ name, email, message, mobile });
 
     try {
-      submission.save();
-      res.status(200).send('Form Submitted');
+      await submission.save();
 
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -49,31 +43,24 @@ router.post(
         },
         subject: 'Form Submission',
         text: `This Email is Sent by Donation Site ICP
-        You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nNumber :${number}\nMessage: ${message}`,
+        You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nNumber: ${mobile}\nMessage: ${message}`,
       };
 
-      transporter.sendMail(mailOptions, (err, response) => {
-        if (err) {
-          console.error('Error in sending email:', err); // Log detailed error
-          return res.status(500).send('Error in sending email');
-        }
-        console.log('Email sent successfully to:', process.env.EMAIL);
-        res.status(200).send('Recovery email sent');
-      });
+      await transporter.sendMail(mailOptions);
+      res.status(200).send('Form Submitted');
     } catch (error) {
-      res.status(400).send(error);
+      console.error('Error in form submission or sending email:', error);
+      res.status(500).send('Error in form submission or email sending');
     }
   }
 );
 
-router.post('/newsletter',(req,res)=>{
-  const {email} = req.body;
-  const newsletter = new Newsletter({
-    email
-  })
+router.post('/newsletter', async (req, res) => {
+  const { email } = req.body;
+  const newsletter = new Newsletter({ email });
+
   try {
-    newsletter.save();
-    res.status(200).send('Form Submitted');
+    await newsletter.save();
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -92,21 +79,15 @@ router.post('/newsletter',(req,res)=>{
       },
       subject: 'Email Submission',
       text: `This Email is Sent by Donation Site ICP
-      You have a new Newsletter Email submission :${email}`,
+      You have a new Newsletter Email submission: ${email}`,
     };
 
-    transporter.sendMail(mailOptions, (err, response) => {
-      if (err) {
-        console.error('Error in sending email:', err); // Log detailed error
-        return res.status(500).send('Error in sending email');
-      }
-      console.log('Email sent successfully to:', process.env.EMAIL);
-      res.status(200).send('Recovery email sent');
-    });
+    transporter.sendMail(mailOptions);
+    res.status(200).send('Form Submitted');
   } catch (error) {
-    res.status(400).send(error);
+    console.error('Error in newsletter submission or sending email:', error);
+    res.status(500).send('Error in newsletter submission or email sending');
   }
-}
-);
+});
 
 module.exports = router;
